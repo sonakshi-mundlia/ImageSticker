@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>About StickSpark</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<script>
+  window.addEventListener("DOMContentLoaded", () => {
+    lucide.createIcons();
+  });
+</script>
+
+<style>
+  body {
+    background: white;
+  }
+  /* Hide scrollbar for Chrome, Safari, Edge */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for Firefox */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+</style>
+</head>
+
+<body class="overflow-x-hidden">
+
+
+<div class="relative flex items-center mt-6 mb-10 lg:mt-8 lg:mb-12 pl-4 lg:pl-10">
+
+  <!-- LEFT ARROW -->
+  <a href="index.html" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-200">
+    <i data-lucide="arrow-left"></i>
+  </a>
+
+  <!-- CENTERED TITLE -->
+  <h1 class="absolute left-1/2 transform -translate-x-1/2 text-xl lg:text-3xl font-extrabold">
+    <span class="text-transparent bg-clip-text bg-black">
+      About StickSpark
+    </span>
+  </h1>
+
+</div>
+<div class="relative w-full h-[400px] flex flex-col md:flex-row items-center justify-center p-6 gap-6 overflow-hidden bg-gradient-to-r from-orange-100 to-white">
+
+  <!-- Background decorative blobs -->
+  <div class="absolute top-[-80px] left-[-80px] w-[250px] h-[250px] bg-orange-200 rounded-full blur-3xl opacity-60"></div>
+
+  <div class="absolute bottom-[-100px] right-[-100px] w-[300px] h-[300px] bg-orange-100 rounded-full blur-3xl opacity-70"></div>
+
+  <div class="absolute top-[40%] left-[60%] w-[180px] h-[180px] bg-white rounded-full blur-2xl opacity-50"></div>
+
+  <!-- Text Section -->
+  <div class="relative z-10 w-full md:w-1/2 text-black text-center md:text-left">
+    <h2 class="text-2xl md:text-4xl font-bold mb-4">
+      Welcome to StickSpark
+    </h2>
+    <p class="text-base md:text-lg leading-relaxed opacity-90">
+      —where your photos transform into high-quality, custom stickers in seconds! 
+  </div>
+
+  <!-- Image Section -->
+  <div class="relative z-10 w-full md:w-1/2 flex justify-center">
+    <img 
+      src="images/car.png"
+      alt="Sample Image"
+      class="object-cover w-[90%] md:w-[80%]"
+    />
+  </div>
+
+</div>
+<div class="w-full px-4 md:px-8 space-y-8 lg:mt-10 mt-6">
+
+  <!-- Top Left Text -->
+  <div class="text-left">
+    <p class="text-base lg:text-lg mb-4">
+      At StickSpark, we believe that every photo holds the potential to become a piece of personalized art, which is why we’ve built an AI-powered ecosystem that specializes in turning ordinary moments into extraordinary digital and physical stickers.
+    </p>
+    <p class="text-base lg:text-lg lg:mb-10 mb-4">
+      Here is a detailed breakdown of what makes StickSpark the ultimate creative companion:
+    </p>
+  </div>
+  
+  <div class="w-full px-4 lg:px-10 py-6 lg:py-8 space-y-10">
+
+    <!-- SECTION 1 -->
+    <div>
+      <h2 class="text-xl lg:text-2xl font-bold mb-4">Our Transformation Modes</h2>
+  
+      <div class="flex gap-10 overflow-x-auto scroll-smooth pb-4 no-scrollbar">
+  
+        <!-- Card 1 -->
+        <div class="min-w-[280px] lg:min-w-[320px] rounded-xl bg-white border border-gray-200 shadow-sm flex flex-col overflow-hidden">
+          <img src="images/about1.jpg" class="h-60 object-cover" />
+          <h3 class="font-semibold text-lg pt-5 pl-5 pb-3 pr-5">Full Body Stylization</h3>
+          <p class="text-sm lg:text-base text-gray-700 pb-5 pl-5 pr-5">
+            Create full character stickers from full-length photos. Perfect for Mini-Me style transformations.
+          </p>
+        
+        </div>
+  
+        <!-- Card 2 -->
+        <div class="min-w-[280px] lg:min-w-[320px] rounded-xl bg-white border border-gray-200 shadow-sm flex flex-col overflow-hidden">
+          <img src="images/about2.jpg" class="h-60 object-cover"/>
+          <h3 class="font-semibold text-lg pt-5 pl-5 pb-3 pr-5">Portrait & Face Focus</h3>
+          <p class="text-sm lg:text-base text-gray-700 pb-5 pl-5 pr-5">
+            High-detail facial expression stickers perfect for chat reactions.
+          </p>
+        </div>
+  
+        <!-- Card 3 -->
+        <div class="min-w-[280px] lg:min-w-[320px] rounded-xl bg-white border border-gray-200 shadow-sm flex flex-col overflow-hidden">
+          <img src="images/about3.jpg" class="h-60 object-cover" />
+          <h3 class="font-semibold text-lg pt-5 pl-5 pb-3 pr-5">Complete Cartoon Overhaul</h3>
+          <p class="text-sm lg:text-base text-gray-700 pb-5 pl-5 pr-5">
+            Turn your entire photo into a hand-drawn cartoon aesthetic.
+          </p>
+        </div>
+  
+        <!-- Card 4 -->
+        <div class="min-w-[280px] lg:min-w-[320px] rounded-xl bg-white border border-gray-200 shadow-sm flex flex-col overflow-hidden">
+          <img src="images/about4.jpg" class="h-60 object-cover" />
+          <h3 class="font-semibold text-lg pt-5 pl-5 pb-3 pr-5">Hybrid Real-to-Toon</h3>
+          <p class="text-sm lg:text-base text-gray-700 pb-5 pl-5 pr-5">
+            Blend real facial features with stylized cartoon bodies.
+          </p>
+        </div>
+  
+      </div>
+    </div>
+  
+    <!-- SECTION 2 -->
+    <div>
+      <h2 class="text-xl lg:text-2xl font-bold mb-4">Key Features</h2>
+  
+      <div class="flex gap-6 overflow-x-auto scroll-smooth pb-4 no-scrollbar">
+  
+        <!-- Card 1 -->
+        <div class="min-w-[280px] lg:min-w-[320px] rounded-xl bg-white border border-gray-200 shadow-sm flex flex-col overflow-hidden">
+          <img src="images/key1.jpg" class="h-60 object-cover"/>
+          <h3 class="font-semibold text-lg pt-5 pl-5 pb-3 pr-5">Instant Background Removal</h3>
+          <p class="text-sm lg:text-base text-gray-700 pb-5 pl-5 pr-5">
+            AI automatically removes background and creates clean sticker edges.
+          </p>
+        </div>
+  
+        <!-- Card 2 -->
+        <div class="min-w-[280px] lg:min-w-[320px] rounded-xl bg-white border border-gray-200 shadow-sm flex flex-col overflow-hidden">
+          <img src="images/key2.jpg" class="h-60 object-cover" />
+          <h3 class="font-semibold text-lg pt-5 pl-5 pb-3 pr-5">Expressive Art Styles</h3>
+          <p class="text-sm lg:text-base text-gray-700 pb-5 pl-5 pr-5">
+            Supports anime, 3D Pixar, graffiti, and vintage sticker styles.
+          </p>
+        </div>
+  
+        <!-- Card 3 -->
+        <div class="min-w-[280px] lg:min-w-[320px] rounded-xl bg-white border border-gray-200 shadow-sm flex flex-col overflow-hidden">
+          <img src="images/key3.jpg" class="h-60 object-cover" />
+          <h3 class="font-semibold text-lg pt-5 pl-5 pb-3 pr-5">High Resolution Output</h3>
+          <p class="text-sm lg:text-base text-gray-700 pb-5 pl-5 pr-5">
+            Crisp, sharp stickers suitable for print and digital use.
+          </p>
+        </div>
+  
+        <!-- Card 4 -->
+        <div class="min-w-[280px] lg:min-w-[320px] rounded-xl bg-white border border-gray-200 shadow-sm flex flex-col overflow-hidden">
+          <img src="images/key4.jpg" class="h-60 object-cover" />
+          <h3 class="font-semibold text-lg pt-5 pl-5 pb-3 pr-5">Smart Body Scaling</h3>
+          <p class="text-sm lg:text-base text-gray-700 pb-5 pl-5 pr-5">
+            Maintains natural proportions for better cartoon balance.
+          </p>
+        </div>
+  
+      </div>
+    </div>
+  
+  </div>
+
+  </div>
+
+  <div class="w-full px-6 md:px-10 space-y-8">
+  <div class="space-y-3">
+    <h2 class="font-bold text-lg lg:text-xl flex items-center">Why StickSpark?</h2>
+
+  <p class="text-sm lg:text-base">
+    "Why settle for generic emojis when you can be the emoji?"</p>
+  <!-- Bullet Points with Icon -->
+  <div class="space-y-3 text-sm lg:text-base">
+    <div class="flex items-start gap-2">
+      <span class="text-blue-500">➜</span>
+      <p><strong>Personalized Branding: </strong>Great for influencers and streamers who want a consistent, cartoonized avatar.</p>
+    </div>
+    <div class="flex items-start gap-2">
+      <span class="text-blue-500">➜</span>
+      <p><strong>Custom Gifts: </strong>Generate stickers of friends or family for birthdays, weddings, or inside jokes.</p>
+    </div>
+    <div class="flex items-start gap-2">
+      <span class="text-blue-500">➜</span>
+      <p><strong>Creative Freedom: </strong>No design skills required—if you can take a photo, you can make a masterpiece.</p>
+    </div>
+  </div>
+  </div>
+  
+
+  <!-- Bottom 6 Small Containers -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+
+    <div class="p-4 border rounded-lg glass">
+      <div class="flex items-center gap-3">
+          <div class="w-12 h-12 bg-orange-400 rounded-lg flex items-center justify-center shrink-0">
+              <i class="fa-solid fa-cloud-arrow-up fa-beat fa-lg" style="color: white;"></i>
+          </div>
+          <h3 class="text-sm lg:text-base font-semibold">
+              Select Your Best Shot
+          </h3>
+      </div>
+      <p class="text-sm lg:text-base text-gray-700 mt-3">
+        Begin by uploading a photo from your gallery or taking a live selfie, whether it’s a detailed portrait or a full-body pose.
+      </p>
+    </div>
+
+    <div class="p-4 border rounded-lg glass">
+      <div class="flex items-center gap-3">
+          <div class="w-12 h-12 bg-orange-400 rounded-lg flex items-center justify-center shrink-0">
+              <i class="fa-solid fa-palette fa-beat fa-lg" style="color: white;"></i>
+          </div>
+          <h3 class="text-sm lg:text-base font-semibold">
+            Choose Your Artistic Vibe
+          </h3>
+      </div>
+      <p class="text-sm lg:text-base text-gray-700 mt-3">
+        Pick your preferred transformation mode—Face Focus, Full-Body, or a total Cartoon Overhaul—to set the creative direction.
+      </p>
+    </div>
+
+    <div class="p-4 border rounded-lg glass">
+      <div class="flex items-center gap-3">
+          <div class="w-12 h-12 bg-orange-400 rounded-lg flex items-center justify-center shrink-0">
+              <i class="fa-solid fa-wand-magic-sparkles fa-beat fa-lg" style="color: white;"></i>
+          </div>
+          <h3 class="text-sm lg:text-base font-semibold">
+            Automatic Subject Isolation
+          </h3>
+      </div>
+      <p class="text-sm lg:text-base text-gray-700 mt-3">
+        Our AI instantly scans your photo to detect the subject and surgically remove the background for a perfectly clean cutout.
+      </p>
+    </div>
+
+    <div class="p-4 border rounded-lg glass">
+      <div class="flex items-center gap-3">
+          <div class="w-12 h-12 bg-orange-400 rounded-lg flex items-center justify-center shrink-0">
+              <i class="fa-solid fa-gears fa-beat fa-lg" style="color: white;"></i>
+          </div>
+          <h3 class="text-sm lg:text-base font-semibold">
+            AI-Powered Stylization
+          </h3>
+      </div>
+      <p class="text-sm lg:text-base text-gray-700 mt-3">
+        Watch in real-time as the "Spark" engine reimagines your image, blending your real-world features into a vibrant, high-fidelity art style.
+      </p>
+    </div>
+
+    <div class="p-4 border rounded-lg glass">
+      <div class="flex items-center gap-3">
+          <div class="w-12 h-12 bg-orange-400 rounded-lg flex items-center justify-center shrink-0">
+              <i class="fa-solid fa-layer-group fa-beat fa-lg" style="color: white;"></i>
+          </div>
+          <h3 class="text-sm lg:text-base font-semibold">
+            Classic Sticker Finishing
+          </h3>
+      </div>
+      <p class="text-sm lg:text-base text-gray-700 mt-3">
+        The system automatically adds a professional white "die-cut" border and ensures the file has a transparent background for that authentic sticker look.
+      </p>
+    </div>
+
+    <div class="p-4 border rounded-lg glass">
+      <div class="flex items-center gap-3">
+          <div class="w-12 h-12 bg-orange-400 rounded-lg flex items-center justify-center shrink-0">
+              <i class="fa-solid fa-share-nodes fa-beat fa-lg" style="color: white;"></i>
+          </div>
+          <h3 class="text-sm lg:text-base font-semibold">
+            Instant Export & Sharing
+          </h3>
+      </div>
+      <p class="text-sm lg:text-base text-gray-700 mt-3">
+        Download your custom creation as a high-quality PNG or export it directly to your favorite messaging apps like WhatsApp or Telegram.
+      </p>
+    </div>
+
+  </div>
+</div>
+
+</div>
+<div id="footer"></div>
+</body>
+</html>

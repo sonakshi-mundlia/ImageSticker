@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favorites</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body class="bg-gray-100">
+
+    <!-- HEADER (optional) -->
+    <header class="p-4 bg-white shadow text-center font-bold text-xl">
+        My Favorites
+    </header>
+
+    <!-- FAVORITES CONTAINER -->
+    <div
+        id="favoritesContainer"
+        class="grid grid-cols-2 md:grid-cols-3 gap-4 p-6"
+    >
+        <!-- JS will load favorites here -->
+    </div>
+
+    <!-- EMPTY STATE (optional fallback) -->
+    <div id="emptyState" class="hidden text-center text-gray-500 p-6">
+        No favorites yet 
+    </div>
+
+    <!-- APP JS (always bottom) -->
+    <script src="app.js"></script>
+
+</body>
+</html>

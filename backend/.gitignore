@@ -19,6 +19,10 @@ build/
 dist/
 *.egg-info/
 
+# Uploads / Generated files
+uploads/
+outputs/
+
 # AI model weights
 *.pth
 *.pt

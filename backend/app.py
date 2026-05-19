@@ -6,11 +6,6 @@ from routes.auth import router as auth_router
 from routes.process import router as process_router
 from routes.outputs import router as outputs_router
 
-import os
-import threading
-
-# import your SDXL loader
-from models.stable_diffusion import load_pipe  # 👈 IMPORTANT
 
 app = FastAPI(
     title="AI Image Processing API",
@@ -40,24 +35,6 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 app.mount("/outputs", StaticFiles(directory=OUTPUT_DIR), name="outputs")
 
 print("OUTPUT DIR:", OUTPUT_DIR)
-
-
-# ------------------------------------
-# BACKGROUND SDXL LOADER
-# ------------------------------------
-def load_models_background():
-    print("🚀 Starting background model loading...")
-    load_pipe()  # this triggers SDXL load
-    print("🔥 All models loaded in background")
-
-
-# ------------------------------------
-# STARTUP EVENT (NON-BLOCKING)
-# ------------------------------------
-@app.on_event("startup")
-def startup_event():
-    thread = threading.Thread(target=load_models_background, daemon=True)
-    thread.start()
 
 
 # ------------------------------------

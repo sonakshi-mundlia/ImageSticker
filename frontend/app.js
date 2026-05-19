@@ -533,18 +533,17 @@ if (loginBtn) {
 
             if (response.ok) {
 
-                // ✅ SAVE TOKEN
+                console.log("LOGIN SUCCESS:", data);
+            
                 localStorage.setItem("token", data.access_token);
-
-                // (optional fallback user)
-                localStorage.setItem("user", JSON.stringify({
-                    email: email
-                }));
-
-                showToast("Login successful");
-
-                window.location.href = "dashboard.html";
-
+            
+                // force sync check
+                console.log("TOKEN SAVED:", localStorage.getItem("token"));
+            
+                setTimeout(() => {
+                    window.location.href = "dashboard.html";
+                }, 200);
+            
             } else {
                 showToast(data.detail || "Login failed");
             }

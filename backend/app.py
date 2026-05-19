@@ -6,6 +6,7 @@ from routes.auth import router as auth_router
 from routes.process import router as process_router
 from routes.outputs import router as outputs_router
 
+import os
 
 app = FastAPI(
     title="AI Image Processing API",

@@ -7,13 +7,11 @@ opencv-python
 numpy
 mediapipe
 ultralytics
-diffusers
-transformers
-accelerate
-safetensors
 fastapi
 uvicorn
 python-multipart
 pydantic
 bcrypt
 PyJWT
+replicate
+requests

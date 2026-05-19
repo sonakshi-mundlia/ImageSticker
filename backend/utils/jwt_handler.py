@@ -49,7 +49,9 @@ def decode_token(token):
 # -------------------------
 # GET CURRENT USER (AUTH MIDDLEWARE)
 # -------------------------
-def get_current_user(authorization: str = Header(None)):
+def get_current_user(request: Request):
+
+    authorization = request.headers.get("authorization")
     
     if not authorization:
         raise HTTPException(status_code=401, detail="Missing token")

@@ -1,7 +1,6 @@
 import torch
 from PIL import Image
 import numpy as np
-import threading
 import random
 from diffusers import StableDiffusionXLImg2ImgPipeline
 
@@ -10,60 +9,44 @@ from diffusers import StableDiffusionXLImg2ImgPipeline
 # GLOBAL STATE
 # ------------------------------------
 pipe = None
-pipe_loading = False
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 
 # ------------------------------------
-# BACKGROUND LOADER
+# LAZY LOADER (SAFE)
 # ------------------------------------
-def _load_pipe_background():
-    global pipe, pipe_loading
+def get_pipe():
+    global pipe
 
-    if pipe is not None or pipe_loading:
-        return
+    if pipe is not None:
+        return pipe
 
-    pipe_loading = True
-    print("🚀 SDXL loading in background...")
+    print("🚀 Loading SDXL model (first request only)...")
 
     model = StableDiffusionXLImg2ImgPipeline.from_pretrained(
         "stabilityai/sdxl-turbo",
-        torch_dtype=torch.float16 if device == "cuda" else torch.float32
+        torch_dtype=torch.float16 if device == "cuda" else torch.float32,
+        variant="fp16" if device == "cuda" else None
     ).to(device)
 
-    # Memory optimization
+    # memory optimizations
     model.enable_attention_slicing()
 
     if device == "cuda":
         model.enable_vae_slicing()
 
     pipe = model
-    pipe_loading = False
 
-    print("🔥 SDXL model loaded successfully")
+    print("🔥 SDXL loaded successfully")
 
-
-# ------------------------------------
-# SAFE PUBLIC LOADER
-# ------------------------------------
-def load_pipe():
-    global pipe
-
-    if pipe is not None:
-        return pipe
-
-    threading.Thread(
-        target=_load_pipe_background,
-        daemon=True
-    ).start()
-
-    return None
+    return pipe
 
 
 # ------------------------------------
-# BETTER STYLE PROMPTS
+# STYLE MAP
 # ------------------------------------
+
 STYLE_MAP = {
     "pixar": "masterpiece, best quality, pixar animated character, 3d animated movie character, expressive eyes, soft rounded facial features, charming smile, smooth skin shading, cinematic lighting, colorful, detailed hair, studio render, octane render",
     "disney": "masterpiece, best quality, disney animated movie character, magical animation style, expressive eyes, soft facial proportions, beautiful skin shading, charming smile, cinematic lighting, detailed hair, professional studio render",
@@ -108,7 +91,7 @@ noise
 
 
 # ------------------------------------
-# UNIVERSAL IMAGE CONVERTER
+# IMAGE CONVERTER
 # ------------------------------------
 def _to_pil(image_input):
 
@@ -119,60 +102,40 @@ def _to_pil(image_input):
         return Image.open(image_input).convert("RGB")
 
     if isinstance(image_input, np.ndarray):
-
         if image_input.shape[-1] == 4:
             image_input = image_input[:, :, :3]
+        return Image.fromarray(image_input.astype("uint8")).convert("RGB")
 
-        return Image.fromarray(
-            image_input.astype("uint8")
-        ).convert("RGB")
-
-    raise TypeError(
-        f"Unsupported image type: {type(image_input)}"
-    )
+    raise TypeError(f"Unsupported type: {type(image_input)}")
 
 
 # ------------------------------------
-# MAIN STYLIZER
+# MAIN FUNCTION
 # ------------------------------------
 def sd_stylize(image_input, style="pixar"):
-    global pipe
 
-    load_pipe()
-
-    if pipe is None:
-        raise Exception("Model still loading...")
+    pipe = get_pipe()
 
     prompt = STYLE_MAP.get(style, STYLE_MAP["pixar"])
 
-    # Image preprocess
     image = _to_pil(image_input)
 
-    # High quality input
-    image = image.resize(
-        (1024, 1024),
-        Image.LANCZOS
-    )
+    # IMPORTANT: reduce memory load (1024 is too heavy for Render)
+    image = image.resize((768, 768), Image.LANCZOS)
 
-    # Different output every time
     seed = random.randint(1, 999999)
 
     with torch.inference_mode():
 
-        generator = torch.Generator(
-            device=device
-        ).manual_seed(seed)
+        generator = torch.Generator(device=device).manual_seed(seed)
 
         result = pipe(
             prompt=prompt,
             negative_prompt=NEGATIVE_PROMPT,
             image=image,
-
-            # Main tuning
-            strength=0.82,
-            num_inference_steps=6,
+            strength=0.75,
+            num_inference_steps=4,   # reduced for stability
             guidance_scale=2.0,
-
             generator=generator
         ).images[0]
 

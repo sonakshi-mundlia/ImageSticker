@@ -1,7 +1,6 @@
 import cv2
 import mediapipe as mp
 import numpy as np
-
 from ultralytics import YOLO
 from models.background import remove_background
 
@@ -14,31 +13,48 @@ MP_MODEL_PATH = "models/path/selfie_multiclass_256x256.tflite"
 
 
 # =====================================================
-# LOAD MODELS ONCE
+# DEVICE MODELS (LAZY LOADING)
 # =====================================================
-print("Loading models...")
+YOLO_MODEL = None
+MP_SEGMENTER = None
 
 
-def load_mediapipe():
-    base_options = mp.tasks.BaseOptions
-    image_segmenter = mp.tasks.vision.ImageSegmenter
-    image_segmenter_options = mp.tasks.vision.ImageSegmenterOptions
+def get_yolo():
+    global YOLO_MODEL
 
-    options = image_segmenter_options(
-        base_options=base_options(
-            model_asset_path=MP_MODEL_PATH
-        ),
-        running_mode=mp.tasks.vision.RunningMode.IMAGE,
-        output_category_mask=True
-    )
+    if YOLO_MODEL is None:
+        print("🚀 Loading YOLO model...")
 
-    return image_segmenter.create_from_options(options)
+        YOLO_MODEL = YOLO(YOLO_PATH)
+
+        print("🔥 YOLO loaded")
+
+    return YOLO_MODEL
 
 
-YOLO_MODEL = YOLO(YOLO_PATH)
-MP_SEGMENTER = load_mediapipe()
+def get_mediapipe():
+    global MP_SEGMENTER
 
-print("Models loaded.")
+    if MP_SEGMENTER is None:
+        print("🚀 Loading MediaPipe model...")
+
+        base_options = mp.tasks.BaseOptions
+        image_segmenter = mp.tasks.vision.ImageSegmenter
+        image_segmenter_options = mp.tasks.vision.ImageSegmenterOptions
+
+        options = image_segmenter_options(
+            base_options=base_options(
+                model_asset_path=MP_MODEL_PATH
+            ),
+            running_mode=mp.tasks.vision.RunningMode.IMAGE,
+            output_category_mask=True
+        )
+
+        MP_SEGMENTER = image_segmenter.create_from_options(options)
+
+        print("🔥 MediaPipe loaded")
+
+    return MP_SEGMENTER
 
 
 # =====================================================
@@ -47,15 +63,7 @@ print("Models loaded.")
 PERSON_CLASS = 0
 
 ANIMAL_CLASSES = [
-    14,  # bird
-    15,  # cat
-    16,  # dog
-    17,  # horse
-    18,  # sheep
-    19,  # cow
-    21,  # bear
-    22,  # zebra
-    23   # giraffe
+    14, 15, 16, 17, 18, 19, 21, 22, 23
 ]
 
 
@@ -67,70 +75,41 @@ def refine_mask(mask):
 
     kernel = np.ones((3, 3), np.uint8)
 
-    alpha = cv2.morphologyEx(
-        alpha,
-        cv2.MORPH_OPEN,
-        kernel
-    )
-
-    alpha = cv2.morphologyEx(
-        alpha,
-        cv2.MORPH_CLOSE,
-        kernel
-    )
-
-    alpha = cv2.GaussianBlur(
-        alpha,
-        (5, 5),
-        0
-    )
+    alpha = cv2.morphologyEx(alpha, cv2.MORPH_OPEN, kernel)
+    alpha = cv2.morphologyEx(alpha, cv2.MORPH_CLOSE, kernel)
+    alpha = cv2.GaussianBlur(alpha, (5, 5), 0)
 
     return alpha
 
 
 # =====================================================
-# HUMAN FACE + HAIR
+# HUMAN SEGMENTATION
 # =====================================================
 def segment_human_face(bgr_image):
-    rgb_image = cv2.cvtColor(
-        bgr_image,
-        cv2.COLOR_BGR2RGB
-    )
+
+    mp_segmenter = get_mediapipe()
+
+    rgb_image = cv2.cvtColor(bgr_image, cv2.COLOR_BGR2RGB)
 
     mp_image = mp.Image(
         image_format=mp.ImageFormat.SRGB,
         data=rgb_image
     )
 
-    result = MP_SEGMENTER.segment(
-        mp_image
-    )
+    result = mp_segmenter.segment(mp_image)
 
-    category_mask = (
-        result.category_mask
-        .numpy_view()
-    )
+    category_mask = result.category_mask.numpy_view()
 
-    # Hair + face skin
     human_mask = np.logical_or(
         category_mask == 1,
         category_mask == 3
     )
 
-    alpha = refine_mask(
-        human_mask
-    )
+    alpha = refine_mask(human_mask)
 
-    b, g, r = cv2.split(
-        bgr_image
-    )
+    b, g, r = cv2.split(bgr_image)
 
-    rgba = cv2.merge([
-        b,
-        g,
-        r,
-        alpha
-    ])
+    rgba = cv2.merge([b, g, r, alpha])
 
     return rgba
 
@@ -139,13 +118,16 @@ def segment_human_face(bgr_image):
 # DETECT SUBJECT TYPE
 # =====================================================
 def detect_subject_type(bgr_image):
-    results = YOLO_MODEL(bgr_image)
+
+    model = get_yolo()
+    results = model(bgr_image)
+
     boxes = results[0].boxes
 
     humans = []
     animals = []
 
-    if len(boxes) == 0:
+    if boxes is None or len(boxes) == 0:
         return "object", []
 
     for box in boxes:
@@ -171,28 +153,19 @@ def detect_subject_type(bgr_image):
 # =====================================================
 # ANIMAL HEAD CROP
 # =====================================================
-def crop_animal_head(
-    image,
-    box
-):
+def crop_animal_head(image, box):
+
     x1, y1, x2, y2 = box
 
     height = y2 - y1
 
-    head_y2 = y1 + int(
-        height * 0.45
-    )
+    head_y2 = y1 + int(height * 0.45)
 
-    crop = image[
-        y1:head_y2,
-        x1:x2
-    ]
-
-    return crop
+    return image[y1:head_y2, x1:x2]
 
 
 # =====================================================
-# MAIN ROUTER
+# MAIN FUNCTION
 # =====================================================
 def process_image(image_bytes):
 
@@ -208,9 +181,6 @@ def process_image(image_bytes):
 
     faces = []
 
-    # ================================
-    # HUMAN MULTI FACE
-    # ================================
     if subject_type == "human":
 
         for box in boxes:
@@ -218,14 +188,11 @@ def process_image(image_bytes):
 
             face_crop = image[y1:y2, x1:x2]
 
-            rgba = segment_human_face(face_crop)
+            # ⚠️ keep only ONE processing (avoid double heavy load)
             rgba = remove_background(face_crop)
 
             faces.append(rgba)
 
-    # ================================
-    # ANIMAL MULTI
-    # ================================
     elif subject_type == "animal":
 
         for box in boxes:
@@ -233,11 +200,7 @@ def process_image(image_bytes):
             rgba = remove_background(animal)
             faces.append(rgba)
 
-    # ================================
-    # OBJECT SINGLE
-    # ================================
     else:
-
         rgba = remove_background(image)
         faces.append(rgba)
 

@@ -508,50 +508,57 @@ const loginBtn = document.getElementById("loginBtn");
 if (loginBtn) {
 
     loginBtn.addEventListener("click", async () => {
-
-        const email = document.getElementById("loginEmail").value.trim();
-        const password = document.getElementById("loginPassword").value.trim();
-
-        if (!email || !password) {
-            showToast("Please fill all fields");
-            return;
-        }
-
         try {
+            const email = document.getElementById("loginEmail").value.trim();
+            const password = document.getElementById("loginPassword").value.trim();
+    
+            console.log("EMAIL:", email);
+            console.log("PASSWORD:", password);
+    
+            if (!email || !password) {
+                console.log("❌ Missing fields");
+                showToast("Please fill all fields");
+                return;
+            }
+    
             const response = await fetch(`${BASE_URL}/api/auth/login`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({
-                    email,
-                    password
-                })
+                body: JSON.stringify({ email, password })
             });
-
+    
+            console.log("LOGIN STATUS:", response.status);
+    
             const data = await response.json();
-
-            if (response.ok) {
-
-                console.log("LOGIN SUCCESS:", data);
-            
-                localStorage.setItem("token", data.access_token);
-            
-                // force sync check
-                console.log("TOKEN SAVED:", localStorage.getItem("token"));
-            
-                setTimeout(() => {
-                    window.location.href = "dashboard.html";
-                }, 200);
-            
-            } else {
+            console.log("LOGIN RESPONSE:", data);
+    
+            if (!response.ok) {
+                console.log("❌ LOGIN FAILED:", data);
                 showToast(data.detail || "Login failed");
+                return;
             }
-
+    
+            // 🔥 IMPORTANT CHECK
+            console.log("ACCESS TOKEN:", data.access_token);
+    
+            if (!data.access_token) {
+                console.log("❌ NO TOKEN RECEIVED");
+                return;
+            }
+    
+            localStorage.setItem("token", data.access_token);
+    
+            console.log("✅ TOKEN SAVED:", localStorage.getItem("token"));
+    
+            setTimeout(() => {
+                window.location.href = "dashboard.html";
+            }, 500);
+    
         } catch (err) {
-            showToast("Server error");
+            console.log("LOGIN ERROR:", err);
         }
-
     });
 }
 

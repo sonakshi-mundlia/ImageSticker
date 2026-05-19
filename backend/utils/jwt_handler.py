@@ -36,7 +36,13 @@ def create_access_token(user_id):
 def decode_token(token):
     try:
         return jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-    except:
+
+    except jwt.ExpiredSignatureError:
+        print("TOKEN EXPIRED")
+        return None
+
+    except jwt.InvalidTokenError as e:
+        print("INVALID TOKEN:", str(e))
         return None
 
 
@@ -48,7 +54,7 @@ def get_current_user(authorization: str = Header(None)):
     if not authorization:
         raise HTTPException(status_code=401, detail="Missing token")
 
-    token = authorization.replace("Bearer ", "")
+    token = authorization.removeprefix("Bearer ").strip()
 
     decoded = decode_token(token)
 

@@ -34,6 +34,7 @@ let currentFile = null;
 let currentMode = "full";
 let currentBlobUrl = null;  
 
+
 function showToast(message = "✔ Done") {
 
     const toast = document.getElementById("toast");
@@ -262,8 +263,17 @@ async function sendToBackend(mode = "full") {
     );
 
     try {
+        const token = localStorage.getItem("token");
+
+        const headers = {};
+
+        if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+        }
+
         const res = await fetch(`${BASE_URL}/api/process/`, {
             method: "POST",
+            headers,
             body: formData
         });
 
@@ -507,31 +517,43 @@ if (loginBtn) {
             return;
         }
 
-        const response = await fetch(`${BASE_URL}/api/auth/login`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            credentials: "include",
+        try {
+            const response = await fetch(`${BASE_URL}/api/auth/login`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email,
+                    password
+                })
+            });
 
-            body: JSON.stringify({
-                email,
-                password
-            })
-        });
+            const data = await response.json();
 
-        const data = await response.json();
+            if (response.ok) {
 
-        if (response.ok) {
-            showToast("Login successful");
-            window.location.href = "dashboard.html";
+                // ✅ SAVE TOKEN
+                localStorage.setItem("token", data.access_token);
 
-        } else {
-            showToast(data.detail);
+                // (optional fallback user)
+                localStorage.setItem("user", JSON.stringify({
+                    email: email
+                }));
+
+                showToast("Login successful");
+
+                window.location.href = "dashboard.html";
+
+            } else {
+                showToast(data.detail || "Login failed");
+            }
+
+        } catch (err) {
+            showToast("Server error");
         }
 
     });
-
 }
 
 function initCircle() {
@@ -654,16 +676,27 @@ if (shareBtn) {
 
 async function loadUserProfile() {
 
+    const token = localStorage.getItem("token");
+
     const response = await fetch(`${BASE_URL}/api/auth/profile`, {
         method: "GET",
-        credentials: "include"   
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
     });
+
+    if (!response.ok) {
+        console.log("Profile fetch failed");
+        return;
+    }
 
     const user = await response.json();
 
-    document.getElementById("userName").innerText = user.name;
-    document.getElementById("userEmail").innerText = user.email;
+    document.getElementById("userName").innerText = user.name || "User";
+    document.getElementById("userEmail").innerText = user.email || "";
 }
+
+
 
 async function loadMyStickers() {
 
@@ -1039,7 +1072,8 @@ window.deleteSticker = async function deleteSticker(url, source) {
         await fetch(`${BASE_URL}/api/outputs`, {
             method: "DELETE",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
             },
             body: JSON.stringify({ url })
         });

@@ -65,22 +65,7 @@ def login(data: LoginRequest, response: Response):
     access_token = create_access_token(user_id)
     refresh_token = create_refresh_token(user_id)
 
-     # Secure cookies
-    response.set_cookie(
-        key="access_token",
-        value=access_token,
-        httponly=True,
-        samesite="lax",
-        secure=False  # True when using HTTPS
-    )
-
-    response.set_cookie(
-        key="refresh_token",
-        value=refresh_token,
-        httponly=True,
-        samesite="lax",
-        secure=False  # True in production HTTPS
-    )
+    
 
     return {
         "message": "Login successful",

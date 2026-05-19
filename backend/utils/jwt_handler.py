@@ -1,6 +1,6 @@
 import jwt
 from datetime import datetime, timedelta
-from fastapi import Header, Cookie, HTTPException 
+from fastapi import Header, HTTPException 
 from bson import ObjectId
 
 import os
@@ -42,12 +42,15 @@ def decode_token(token):
     except:
         return None
 
-def get_current_user(access_token: str = Cookie(None)):
-
-    if not access_token:
+def get_current_user(authorization: str = Header(None)):
+    
+    if not authorization:
         raise HTTPException(status_code=401, detail="Missing token")
 
-    decoded = decode_token(access_token)
+    # remove "Bearer "
+    token = authorization.replace("Bearer ", "")
+
+    decoded = decode_token(token)
 
     if not decoded:
         raise HTTPException(status_code=401, detail="Invalid token")
@@ -58,20 +61,14 @@ def get_current_user(access_token: str = Cookie(None)):
         raise HTTPException(status_code=401, detail="Invalid token payload")
 
     try:
-        print("SEARCHING USER ID:", user_id)
-
-        # safer ObjectId handling
         try:
             query_id = ObjectId(user_id)
-        except Exception:
-            query_id = user_id  # fallback if stored as string in DB
+        except:
+            query_id = user_id
 
         user = users_collection.find_one({"_id": query_id})
 
-        print("FOUND USER:", user)
-
-    except Exception as e:
-        print("DATABASE ERROR:", str(e))
+    except Exception:
         raise HTTPException(status_code=500, detail="Database error")
 
     if not user:

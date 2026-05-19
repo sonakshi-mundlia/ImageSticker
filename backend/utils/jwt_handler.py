@@ -13,15 +13,16 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 
 MONGO_URI = os.getenv("MONGO_URI")
 DB_NAME = os.getenv("DB_NAME")
-
 USERS_COLLECTION = os.getenv("USERS_COLLECTION")
 
 client = MongoClient(MONGO_URI)
 db = client[DB_NAME]
-
 users_collection = db[USERS_COLLECTION]
 
 
+# -------------------------
+# CREATE ACCESS TOKEN ONLY
+# -------------------------
 def create_access_token(user_id):
     return jwt.encode({
         "user_id": str(user_id),
@@ -29,25 +30,24 @@ def create_access_token(user_id):
     }, SECRET_KEY, algorithm="HS256")
 
 
-def create_refresh_token(user_id):
-    return jwt.encode({
-        "user_id": str(user_id),
-        "exp": datetime.utcnow() + timedelta(days=7)
-    }, SECRET_KEY, algorithm="HS256")
-
-
+# -------------------------
+# DECODE TOKEN
+# -------------------------
 def decode_token(token):
     try:
         return jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
     except:
         return None
 
+
+# -------------------------
+# GET CURRENT USER (AUTH MIDDLEWARE)
+# -------------------------
 def get_current_user(authorization: str = Header(None)):
     
     if not authorization:
         raise HTTPException(status_code=401, detail="Missing token")
 
-    # remove "Bearer "
     token = authorization.replace("Bearer ", "")
 
     decoded = decode_token(token)

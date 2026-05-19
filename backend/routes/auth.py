@@ -48,9 +48,8 @@ def register(data: RegisterRequest):
         "message": "User registered successfully"
     }
 
-
 @router.post("/login")
-def login(data: LoginRequest, response: Response):
+def login(data: LoginRequest):
 
     user = users_collection.find_one({"email": data.email})
 
@@ -63,14 +62,10 @@ def login(data: LoginRequest, response: Response):
     user_id = str(user["_id"])
 
     access_token = create_access_token(user_id)
-    refresh_token = create_refresh_token(user_id)
-
-    
 
     return {
         "message": "Login successful",
-        "access_token": access_token,
-        "refresh_token": refresh_token
+        "access_token": access_token
     }
 
 @router.get("/profile")

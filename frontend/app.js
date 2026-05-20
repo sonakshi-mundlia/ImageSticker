@@ -702,8 +702,6 @@ async function loadUserProfile() {
     document.getElementById("userEmail").innerText = user.email || "";
 }
 
-
-
 async function loadMyStickers() {
 
     try {

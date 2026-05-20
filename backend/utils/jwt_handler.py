@@ -53,7 +53,7 @@ def decode_token(token):
 # -------------------------
 def get_current_user(request: Request):
     authorization = request.headers.get("authorization")
-
+    print("DEBUG RECEIVED HEADER:", authorization)  # <-- Check what the frontend is actually sending!
 
     if not authorization:
         raise HTTPException(status_code=401, detail="Missing token")
@@ -62,37 +62,20 @@ def get_current_user(request: Request):
         raise HTTPException(status_code=401, detail="Invalid auth format")
 
     token = authorization.replace("Bearer ", "").strip()
-
-
-    if not token or token.lower() == "null":
-        raise HTTPException(status_code=401, detail="Empty token")
-
     decoded = decode_token(token)
+    print("DEBUG DECODED PAYLOAD:", decoded)        # <-- Check if decoding actually returns the JSON object!
 
     if not decoded:
         raise HTTPException(status_code=401, detail="Invalid token")
 
     user_id = decoded.get("user_id")
+    print("DEBUG LOOKING UP USER ID:", user_id)
 
-    if not user_id:
-        raise HTTPException(status_code=401, detail="Invalid token payload")
-
-    try:
-        try:
-            query_id = ObjectId(user_id)
-        except Exception:
-            query_id = user_id
-
-        user = users_collection.find_one({"_id": query_id})
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail="Database error")
+    # Let's see if MongoDB actually finds it
+    user = users_collection.find_one({"_id": ObjectId(user_id)})
+    print("DEBUG MONGO RESULT:", user)              # <-- If this prints 'None', your DB collection is mismatched or empty!
 
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-
-    return {
-        "id": str(user["_id"]),
-        "name": user.get("name"),
-        "email": user.get("email")
-    }
+        
+    return {"id": str(user["_id"]), "name": user.get("name"), "email": user.get("email")}

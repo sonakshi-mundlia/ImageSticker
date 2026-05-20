@@ -57,11 +57,22 @@
   
     </div>
 
-    <script src="app.js" defer></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script>
-      lucide.createIcons();
+      try {
+        if (typeof lucide !== 'undefined') {
+          lucide.createIcons();
+        } else {
+          console.warn("Lucide library didn't load in time, skipping icon render.");
+        }
+      } catch (err) {
+        console.error("Lucide encountered an initialization error:", err);
+      }
     </script>
+    <script src="app.js"></script>
   
   </body>
   </html>
+
+
+

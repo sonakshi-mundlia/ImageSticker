@@ -1,6 +1,6 @@
 import jwt
 from datetime import datetime, timedelta
-from fastapi import Header, HTTPException 
+from fastapi import Header, HTTPException, Request
 from bson import ObjectId
 
 import os
@@ -24,10 +24,12 @@ users_collection = db[USERS_COLLECTION]
 # CREATE ACCESS TOKEN ONLY
 # -------------------------
 def create_access_token(user_id):
+    print("SECRET_KEY =", SECRET_KEY)
     return jwt.encode({
         "user_id": str(user_id),
-        "exp": datetime.utcnow() + timedelta(minutes=15)
+        "exp": datetime.utcnow() + timedelta(days=7)
     }, SECRET_KEY, algorithm="HS256")
+
 
 
 # -------------------------
@@ -50,13 +52,20 @@ def decode_token(token):
 # GET CURRENT USER (AUTH MIDDLEWARE)
 # -------------------------
 def get_current_user(request: Request):
-
     authorization = request.headers.get("authorization")
-    
+
+
     if not authorization:
         raise HTTPException(status_code=401, detail="Missing token")
 
-    token = authorization.removeprefix("Bearer ").strip()
+    if not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Invalid auth format")
+
+    token = authorization.replace("Bearer ", "").strip()
+
+
+    if not token or token.lower() == "null":
+        raise HTTPException(status_code=401, detail="Empty token")
 
     decoded = decode_token(token)
 
@@ -71,12 +80,12 @@ def get_current_user(request: Request):
     try:
         try:
             query_id = ObjectId(user_id)
-        except:
+        except Exception:
             query_id = user_id
 
         user = users_collection.find_one({"_id": query_id})
 
-    except Exception:
+    except Exception as e:
         raise HTTPException(status_code=500, detail="Database error")
 
     if not user:

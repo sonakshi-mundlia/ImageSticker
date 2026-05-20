@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends, Response
 from pydantic import BaseModel
 from db.mongo import users_collection
-from utils.jwt_handler import create_access_token, create_refresh_token, decode_token, get_current_user
+from utils.jwt_handler import create_access_token, decode_token, get_current_user
 import bcrypt
 
 class RegisterRequest(BaseModel):

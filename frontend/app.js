@@ -463,29 +463,51 @@ document.addEventListener("DOMContentLoaded", () => {
     const loginBtn = document.getElementById("loginBtn");
 
     if (loginBtn) {
+        console.log("✅ Login button found");
+    
         loginBtn.addEventListener("click", async (e) => {
             e.preventDefault();
-
-            const email = document.getElementById("loginEmail").value.trim();
-            const password = document.getElementById("loginPassword").value.trim();
-
-            const response = await fetch(`${BASE_URL}/api/auth/login`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, password })
-            });
-
-            const data = await response.json();
-
-            console.log("LOGIN RESPONSE:", data);
-
-            if (data.access_token) {
-                localStorage.setItem("token", data.access_token);
-                console.log("TOKEN SAVED:", localStorage.getItem("token"));
-
-                window.location.href = "dashboard.html";
+    
+            console.log("🔥 LOGIN CLICKED");
+    
+            const email = document.getElementById("loginEmail")?.value.trim();
+            const password = document.getElementById("loginPassword")?.value.trim();
+    
+            console.log("📩 EMAIL:", email);
+            console.log("🔑 PASSWORD:", password ? "PROVIDED" : "MISSING");
+    
+            try {
+                const response = await fetch(`${BASE_URL}/api/auth/login`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email, password })
+                });
+    
+                console.log("📡 RESPONSE RECEIVED");
+                console.log("STATUS:", response.status);
+    
+                const data = await response.json();
+    
+                console.log("📦 LOGIN RESPONSE:", data);
+    
+                if (data.access_token && response.ok) {
+                    localStorage.setItem("token", data.access_token);
+    
+                    console.log("💾 TOKEN SAVED:", localStorage.getItem("token"));
+    
+                    console.log("🚀 REDIRECTING TO DASHBOARD");
+    
+                    window.location.href = "dashboard.html";
+                } else {
+                    console.log("❌ LOGIN FAILED OR NO TOKEN");
+                }
+    
+            } catch (err) {
+                console.log("💥 ERROR OCCURRED:", err);
             }
         });
+    } else {
+        console.log("❌ Login button NOT FOUND in DOM");
     }
 
     // ---------------- REGISTER ----------------

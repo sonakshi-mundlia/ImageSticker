@@ -507,52 +507,50 @@ const loginBtn = document.getElementById("loginBtn");
 
 if (loginBtn) {
     loginBtn.addEventListener("click", async (e) => {
-        // 1. Force the browser to wait for our code to finish
+        // 1. Force the browser to halt any automatic reloads
         e.preventDefault(); 
-        
-        console.log("🚀 Login button clicked! Attempting auth request...");
 
         try {
             const email = document.getElementById("loginEmail").value.trim();
             const password = document.getElementById("loginPassword").value.trim();
 
-            // 2. Hardcode the production endpoint to bypass configuration bugs
-            const response = await fetch("https://imagesticker.onrender.com/api/auth/login", {
+            if (!email || !password) {
+                alert("Please fill all fields");
+                return;
+            }
+
+            // 2. Use your dynamic production API base URL string
+            const response = await fetch(`${BASE_URL}/api/auth/login`, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password })
             });
 
-            console.log("📡 RESPONSE STATUS FROM RENDER:", response.status);
-            
             const data = await response.json();
-            console.log("📦 DATA RETURNED FROM RENDER:", data);
 
             if (!response.ok) {
-                console.log("❌ RENDER REJECTED LOGIN:", data.detail);
-                alert("Login failed: " + (data.detail || "Unknown error"));
+                alert(data.detail || "Login failed");
                 return;
             }
 
             if (data.access_token) {
-                // 3. Save it with lowercase "token"
+                // 3. Save the token to storage synchronously
                 localStorage.setItem("token", data.access_token);
-                console.log("🔒 VERIFY STORAGE RETRIEVAL:", localStorage.getItem("token"));
                 
-                // 4. COMMENT OUT THE REDIRECT TEMPORARILY 
-                // This lets us look at the storage without the page shifting
-                alert("SUCCESS! Check your application storage tab now before clicking ok.");
-                
-                window.location.href = "dashboard.html";
-            } else {
-                console.log("🤔 Keys found in payload, but 'access_token' was missing:", data);
+                // 4. Double-check that it successfully exists in disk memory right now
+                const verifyToken = localStorage.getItem("token");
+                console.log("🔒 Token safely locked in storage:", verifyToken);
+
+                // 5. ONLY redirect if the verification check confirms the token was saved
+                if (verifyToken) {
+                    window.location.href = "dashboard.html";
+                } else {
+                    console.error("❌ Storage commit failed to register in time.");
+                }
             }
 
         } catch (err) {
-            // This catches CORS issues, internet dropouts, or network failures
-            console.log("🚨 CRITICAL NETWORK/CORS ERROR:", err);
+            console.error("Login connection error:", err);
         }
     });
 }

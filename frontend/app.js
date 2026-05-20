@@ -506,8 +506,11 @@ if(registerBtn){
 const loginBtn = document.getElementById("loginBtn");
 
 if (loginBtn) {
-
-    loginBtn.addEventListener("click", async () => {
+    // 1. Pass 'e' (the event object) into the function parameters
+    loginBtn.addEventListener("click", async (e) => {
+        // 2. Prevent the form from natively reloading the page immediately
+        e.preventDefault(); 
+        
         try {
             const email = document.getElementById("loginEmail").value.trim();
             const password = document.getElementById("loginPassword").value.trim();
@@ -520,6 +523,9 @@ if (loginBtn) {
                 showToast("Please fill all fields");
                 return;
             }
+    
+            // 3. Log the target URL explicitly to verify production routing
+            console.log("🎯 SENDING REQUEST TO:", `${BASE_URL}/api/auth/login`);
     
             const response = await fetch(`${BASE_URL}/api/auth/login`, {
                 method: "POST",
@@ -540,7 +546,6 @@ if (loginBtn) {
                 return;
             }
     
-            // 🔥 IMPORTANT CHECK
             console.log("ACCESS TOKEN:", data.access_token);
     
             if (!data.access_token) {
@@ -548,16 +553,18 @@ if (loginBtn) {
                 return;
             }
     
+            // Write it to the current domain's bucket
             localStorage.setItem("token", data.access_token);
+            console.log("✅ TOKEN SAVED SUCCESSFULLY:", localStorage.getItem("token"));
     
-            console.log("✅ TOKEN SAVED:", localStorage.getItem("token"));
-    
+            // 4. Force strict absolute routing relative to your current domain
             setTimeout(() => {
-                window.location.href = "dashboard.html";
+                window.location.href = "/dashboard.html";
             }, 500);
     
         } catch (err) {
             console.log("LOGIN ERROR:", err);
+            showToast("An unexpected error occurred connection-wise");
         }
     });
 }

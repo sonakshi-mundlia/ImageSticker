@@ -457,69 +457,18 @@ function toggleText(id, btn) {
 
 }
 
-const registerBtn = document.getElementById("registerBtn");
+document.addEventListener("DOMContentLoaded", () => {
 
-if(registerBtn){
-    registerBtn.addEventListener("click", async function () {
-        console.log("Register button clicked");
+    // ---------------- LOGIN ----------------
+    const loginBtn = document.getElementById("loginBtn");
 
+    if (loginBtn) {
+        loginBtn.addEventListener("click", async (e) => {
+            e.preventDefault();
 
-    const name = document.getElementById("name").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value.trim();
-
-    if (!name || !email || !password) {
-        showToast("Please fill all fields");
-        return;
-    }
-
-    try {
-        const response = await fetch(`${BASE_URL}/api/auth/register`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                name,
-                email,
-                password
-            })
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            showToast("Registration successful!");
-            window.location.href = "dashboard.html";
-
-        } else {
-            showToast(data.message);
-        }
-
-    } catch (error) {
-        showToast("Server error");
-    }
-
-});
-}
-
-const loginBtn = document.getElementById("loginBtn");
-
-if (loginBtn) {
-    loginBtn.addEventListener("click", async (e) => {
-        // 1. Force the browser to halt any automatic reloads
-        e.preventDefault(); 
-
-        try {
             const email = document.getElementById("loginEmail").value.trim();
             const password = document.getElementById("loginPassword").value.trim();
 
-            if (!email || !password) {
-                alert("Please fill all fields");
-                return;
-            }
-
-            // 2. Use your dynamic production API base URL string
             const response = await fetch(`${BASE_URL}/api/auth/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -528,32 +477,62 @@ if (loginBtn) {
 
             const data = await response.json();
 
-            if (!response.ok) {
-                alert(data.detail || "Login failed");
-                return;
-            }
+            console.log("LOGIN RESPONSE:", data);
 
             if (data.access_token) {
-                // 3. Save the token to storage synchronously
                 localStorage.setItem("token", data.access_token);
-                
-                // 4. Double-check that it successfully exists in disk memory right now
-                const verifyToken = localStorage.getItem("token");
-                console.log("🔒 Token safely locked in storage:", verifyToken);
+                console.log("TOKEN SAVED:", localStorage.getItem("token"));
 
-                // 5. ONLY redirect if the verification check confirms the token was saved
-                if (verifyToken) {
-                    window.location.href = "dashboard.html";
-                } else {
-                    console.error("❌ Storage commit failed to register in time.");
-                }
+                window.location.href = "dashboard.html";
             }
+        });
+    }
 
-        } catch (err) {
-            console.error("Login connection error:", err);
-        }
-    });
-}
+    // ---------------- REGISTER ----------------
+    const registerBtn = document.getElementById("registerBtn");
+
+    if (registerBtn) {
+        registerBtn.addEventListener("click", async () => {
+
+            const name = document.getElementById("name")?.value.trim();
+            const email = document.getElementById("email")?.value.trim();
+            const password = document.getElementById("password")?.value.trim();
+
+            const response = await fetch(`${BASE_URL}/api/auth/register`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, email, password })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                window.location.href = "login.html";
+            } else {
+                alert(data.message);
+            }
+        });
+    }
+
+    // ---------------- DASHBOARD LOADERS ----------------
+    if (document.getElementById("favoritesContainer")) loadFavorites();
+    if (document.getElementById("stickersContainer")) loadMyStickers();
+    if (document.getElementById("collectionsContainer")) loadCollections();
+    if (document.getElementById("deletedContainer")) loadDeleted();
+
+    initCircle();
+
+    if (window.location.pathname.includes("dashboard.html")) {
+        loadUserProfile();
+    }
+
+    if (typeof lucide !== "undefined") {
+        lucide.createIcons();
+    }
+
+});
+
+
 
 function initCircle() {
 
@@ -1255,40 +1234,5 @@ function deleteForever(url) {
     }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
 
-    // Favorites
-    if (document.getElementById("favoritesContainer")) {
-        loadFavorites();
-    }
-
-    // My stickers
-    if (document.getElementById("stickersContainer")) {
-        loadMyStickers();
-    }
-
-    // Collections
-    if (document.getElementById("collectionsContainer")) {
-        loadCollections();
-    }
-
-    // Deleted
-    if (document.getElementById("deletedContainer")) {
-        loadDeleted();
-    }
-
-    // Circle UI
-    initCircle();
-
-    // Dashboard profile
-    if (window.location.pathname.includes("dashboard.html")) {
-        loadUserProfile();
-    }
-
-    // Icons
-    if (typeof lucide !== "undefined") {
-        lucide.createIcons();
-    }
-
-});
 

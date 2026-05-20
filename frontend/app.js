@@ -506,65 +506,53 @@ if(registerBtn){
 const loginBtn = document.getElementById("loginBtn");
 
 if (loginBtn) {
-    // 1. Pass 'e' (the event object) into the function parameters
     loginBtn.addEventListener("click", async (e) => {
-        // 2. Prevent the form from natively reloading the page immediately
+        // 1. Force the browser to wait for our code to finish
         e.preventDefault(); 
         
+        console.log("🚀 Login button clicked! Attempting auth request...");
+
         try {
             const email = document.getElementById("loginEmail").value.trim();
             const password = document.getElementById("loginPassword").value.trim();
-    
-            console.log("EMAIL:", email);
-            console.log("PASSWORD:", password);
-    
-            if (!email || !password) {
-                console.log("❌ Missing fields");
-                showToast("Please fill all fields");
-                return;
-            }
-    
-            // 3. Log the target URL explicitly to verify production routing
-            console.log("🎯 SENDING REQUEST TO:", `${BASE_URL}/api/auth/login`);
-    
-            const response = await fetch(`${BASE_URL}/api/auth/login`, {
+
+            // 2. Hardcode the production endpoint to bypass configuration bugs
+            const response = await fetch("https://imagesticker.onrender.com/api/auth/login", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({ email, password })
             });
-    
-            console.log("LOGIN STATUS:", response.status);
-    
+
+            console.log("📡 RESPONSE STATUS FROM RENDER:", response.status);
+            
             const data = await response.json();
-            console.log("LOGIN RESPONSE:", data);
-    
+            console.log("📦 DATA RETURNED FROM RENDER:", data);
+
             if (!response.ok) {
-                console.log("❌ LOGIN FAILED:", data);
-                showToast(data.detail || "Login failed");
+                console.log("❌ RENDER REJECTED LOGIN:", data.detail);
+                alert("Login failed: " + (data.detail || "Unknown error"));
                 return;
             }
-    
-            console.log("ACCESS TOKEN:", data.access_token);
-    
-            if (!data.access_token) {
-                console.log("❌ NO TOKEN RECEIVED");
-                return;
+
+            if (data.access_token) {
+                // 3. Save it with lowercase "token"
+                localStorage.setItem("token", data.access_token);
+                console.log("🔒 VERIFY STORAGE RETRIEVAL:", localStorage.getItem("token"));
+                
+                // 4. COMMENT OUT THE REDIRECT TEMPORARILY 
+                // This lets us look at the storage without the page shifting
+                alert("SUCCESS! Check your application storage tab now before clicking ok.");
+                
+                window.location.href = "dashboard.html";
+            } else {
+                console.log("🤔 Keys found in payload, but 'access_token' was missing:", data);
             }
-    
-            // Write it to the current domain's bucket
-            localStorage.setItem("token", data.access_token);
-            console.log("✅ TOKEN SAVED SUCCESSFULLY:", localStorage.getItem("token"));
-    
-            // 4. Force strict absolute routing relative to your current domain
-            setTimeout(() => {
-                window.location.href = "/dashboard.html";
-            }, 500);
-    
+
         } catch (err) {
-            console.log("LOGIN ERROR:", err);
-            showToast("An unexpected error occurred connection-wise");
+            // This catches CORS issues, internet dropouts, or network failures
+            console.log("🚨 CRITICAL NETWORK/CORS ERROR:", err);
         }
     });
 }
